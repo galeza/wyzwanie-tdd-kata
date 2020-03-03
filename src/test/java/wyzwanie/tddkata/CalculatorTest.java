@@ -1,10 +1,19 @@
 package wyzwanie.tddkata;
 
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import java.util.stream.Stream;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+
 
 public class CalculatorTest {
 
@@ -155,7 +164,7 @@ public class CalculatorTest {
     }
 
     //what about this case?
-    @Ignore
+    @Disabled
     @Test
     public void should_use_default_separator_when_eol_separator_is_provided() {
         //given
