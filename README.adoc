@@ -66,7 +66,7 @@ Poprzednia funkcjonalność powinna działać bez zmian.
 
 Przykład: //[;]\n1;2 powinno zwrócić 3
 
-Zadanie {counter: seq}. Separator dowolnej długości i liczby w odpowiednim zakresie
+== Zadanie {counter: seq}. Separator dowolnej długości i liczby w odpowiednim zakresie
 Separator dowolnej długości
 Separator powinien być dowolnej długości a nie tylko ograniczony do jednego znaku.
 
