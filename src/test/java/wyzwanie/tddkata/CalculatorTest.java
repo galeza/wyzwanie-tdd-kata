@@ -8,174 +8,76 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
 import java.util.stream.Stream;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 
 public class CalculatorTest {
 
-    @Test
-    public void should_return_zero_for_empty_string() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String emptyString = "";
 
-        //when
-        Integer result = calculatorUnderTest.add(emptyString);
-
-        //then
-        assertThat(result, equalTo(0));
-    }
-
-    @Test
-    public void should_return_zero_for_null() {
+    @ParameterizedTest
+    @MethodSource
+    public void should_sum_given_numbers(String input, Integer expectedResult) throws Calculator.NegativeNotAllowed {
         //given
         Calculator calculatorUnderTest = new Calculator();
 
         //when
-        Integer result = calculatorUnderTest.add(null);
+        Integer result = calculatorUnderTest.add(input);
 
         //then
-        assertThat(result, equalTo(0));
+        assertThat(result, equalTo(expectedResult));
+
     }
 
-    @Test
-    public void should_return_zero_for_string_with_only_separator() {
+    private static Stream<Arguments> should_sum_given_numbers() {
+        return Stream.of(
+                Arguments.of("", 0),
+                Arguments.of(null, 0),
+                Arguments.of(",", 0),
+                Arguments.of("aga, 1", 1),
+                Arguments.of("3", 3),
+                Arguments.of("1,4", 5),
+                Arguments.of("1, 4, 6, 2, 3, 4", 20),
+                Arguments.of("//[,]\\n1,2", 3),
+                Arguments.of("//[a]\\n1a2", 3),
+                Arguments.of("//[]\\n1,2", 3),
+                Arguments.of("2000,2,500", 502),
+                Arguments.of("2000,2300,5500", 0),
+                Arguments.of("1000,2300,1", 1001),
+                Arguments.of("1001,2300,1", 1),
+                Arguments.of("//[\\n]\\n1\\n2", 0)
+
+
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void should_return_exception_when_negative_number_provided(String input, String expectedResult) throws Calculator.NegativeNotAllowed {
         //given
         Calculator calculatorUnderTest = new Calculator();
-        String emptyString = ",";
 
         //when
-        Integer result = calculatorUnderTest.add(emptyString);
+        Exception exception = assertThrows(Calculator.NegativeNotAllowed.class,
+                () -> calculatorUnderTest.add(input));
 
         //then
-        assertThat(result, equalTo(0));
-    }
-
-    @Test
-    public void should_ignore_not_numbers_for_string_with_text_and_number() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String emptyString = "aga, 1";
-
-        //when
-        Integer result = calculatorUnderTest.add(emptyString);
-
-        //then
-        assertThat(result, equalTo(1));
-    }
-
-    @Test
-    public void should_return_number_when_only_one_number_is_provided() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "3";
-
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
-
-        //then
-        assertThat(result, equalTo(3));
-    }
-
-    @Test
-    public void should_return_five_when_one_and_four_numbers_are_provided() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "1, 4";
-
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
-
-        //then
-        assertThat(result, equalTo(5));
-    }
-
-    @Test
-    public void should_accept_any_number_of_parameters() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "1, 4, 6, 2, 3, 4";
-
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
-
-        //then
-        assertThat(result, equalTo(20));
-    }
-
-    @Test
-    public void should_accept_comma_when_new_separator_is_provided() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "//[,]\\n1,2";
-
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
-
-        //then
-        assertThat(result, equalTo(3));
+        assertThat(exception.getMessage(), equalTo(expectedResult));
 
     }
 
-    @Test
-    public void should_accept_double_comma_when_new_separator_is_provided() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "//[,,]\\n1,,2";
+    private static Stream<Arguments> should_return_exception_when_negative_number_provided() {
+        return Stream.of(
+                Arguments.of("2,3,-1,6,-4", "NegativeNotAllowed(-1, -4)"),
+                Arguments.of("-2,-3,-1,-6,-4", "NegativeNotAllowed(-2, -3, -1, -6, -4)")
 
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
 
-        //then
-        assertThat(result, equalTo(3));
-
+        );
     }
 
-    @Test
-    public void should_accept_letter_when_new_separator_is_provided() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "//[a]\\n1a2";
-
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
-
-        //then
-        assertThat(result, equalTo(3));
-
-    }
-
-    @Test
-    public void should_use_default_separator_when_empty_separator_is_provided() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "//[]\\n1,2";
-
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
-
-        //then
-        assertThat(result, equalTo(3));
-
-    }
-
-    //what about this case?
-    @Disabled
-    @Test
-    public void should_use_default_separator_when_eol_separator_is_provided() {
-        //given
-        Calculator calculatorUnderTest = new Calculator();
-        String oneString = "//[\\n]\\n1\\n2";
-
-        //when
-        Integer result = calculatorUnderTest.add(oneString);
-
-        //then
-        assertThat(result, equalTo(3));
-
-    }
 }

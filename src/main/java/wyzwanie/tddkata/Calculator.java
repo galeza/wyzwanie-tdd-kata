@@ -1,5 +1,6 @@
 package wyzwanie.tddkata;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,7 +11,7 @@ public class Calculator {
     private static final String DEFAULT_SEPARATOR = ",";
 
 
-    public Integer add(String input) {
+    public Integer add(String input) throws NegativeNotAllowed {
         int sum =0;
         if (input != null) {
             String[] inputExtractDelimiter = input.split("\\\\n");
@@ -30,22 +31,40 @@ public class Calculator {
         return sum;
     }
 
-    private Integer countSum(String inputNumbers, String separator){
+    private Integer countSum(String inputNumbers, String separator) throws NegativeNotAllowed {
         String[] inputToArray = inputNumbers.split(separator);
-        int[] inputToIntArray = new int[inputToArray.length];
+        ArrayList<Integer>  inputToIntArray = new ArrayList<>();
+        ArrayList<Integer> negativeInputIntArray = new ArrayList<>();
         for (int i = 0; i < inputToArray.length; i++) {
             try {
-                inputToIntArray[i] = Integer.parseInt(inputToArray[i].trim());
+                int intValue = Integer.parseInt(inputToArray[i].trim());
+
+                if(intValue > 0 && intValue < 1001){
+                    inputToIntArray.add(intValue);
+                }
+                if(intValue< 0) {
+                    negativeInputIntArray.add(intValue);
+                }
             } catch (NumberFormatException e) {
                 System.out.println("Not a number");
             }
         }
-        return IntStream.of(inputToIntArray).sum();
+        if(!negativeInputIntArray.isEmpty()){
+            throw new NegativeNotAllowed("NegativeNotAllowed" + negativeInputIntArray.toString().replace("[","(").replace("]",")"));
+        }
+//        return IntStream.of(inputToIntArray).sum();
+        return  inputToIntArray.stream().mapToInt(Integer::intValue).sum();
+    }
+
+    public class NegativeNotAllowed extends Exception {
+        public NegativeNotAllowed(String errorMessage) {
+            super(errorMessage);
+        }
     }
 
     //Do not modify code below this line. This is just a runner
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NegativeNotAllowed {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter calculation. Ctrl+d for exit.");
 
